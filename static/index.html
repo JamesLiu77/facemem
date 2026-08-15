@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>人脸记忆 · 本地智能识别</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <!-- 顶部标题栏 -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">👤</div>
+      <div class="brand-text">
+        <h1>人脸记忆</h1>
+        <span class="brand-sub">本地智能 · 完全离线</span>
+      </div>
+    </div>
+    <div id="modeBadge" class="mode-badge idle">待机</div>
+  </header>
+
+  <main class="layout">
+    <!-- 中央视频预览区 -->
+    <section class="preview-card glass">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="canvas"></canvas>
+      <div id="progressOverlay" class="progress-overlay hidden">
+        <div class="progress-ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="52" />
+            <circle id="ringBar" class="ring-bar" cx="60" cy="60" r="52" />
+          </svg>
+          <span id="progressText">0 / 6</span>
+        </div>
+        <p id="progressHint">请正对摄像头，保持不动…</p>
+      </div>
+      <div id="cameraPlaceholder" class="camera-placeholder">
+        <div class="ph-icon">📷</div>
+        <p>摄像头未开启</p>
+        <p class="ph-sub">点击「开始训练」或「开始识别」</p>
+      </div>
+    </section>
+
+    <!-- 右侧控制面板 -->
+    <aside class="panel glass">
+      <!-- 模式控制 -->
+      <div class="panel-section">
+        <h2 class="panel-title">模式控制</h2>
+        <div class="mode-buttons">
+          <button id="btnTrain" class="btn btn-primary">🎯 开始训练</button>
+          <button id="btnRecognize" class="btn btn-accent">👋 开始识别</button>
+          <button id="btnStop" class="btn btn-ghost hidden">⏹ 停止</button>
+        </div>
+      </div>
+
+      <!-- 训练录入区 -->
+      <div id="trainSection" class="panel-section hidden">
+        <h2 class="panel-title">录入名字</h2>
+        <div class="train-flow">
+          <input id="nameInput" class="text-input" type="text" maxlength="20"
+                 placeholder="输入名字，或点击右侧语音说出" />
+          <button id="btnVoiceName" class="btn btn-outline" title="说出名字">
+            🎤 说出名字
+          </button>
+          <div class="train-actions">
+            <button id="btnSaveName" class="btn btn-primary btn-sm" disabled>💾 保存</button>
+            <button id="btnCancelTrain" class="btn btn-ghost btn-sm">取消</button>
+          </div>
+          <p id="voiceStatus" class="voice-status"></p>
+        </div>
+      </div>
+
+      <!-- 已录入人员 -->
+      <div class="panel-section grow">
+        <h2 class="panel-title">已录入人员</h2>
+        <ul id="peopleList" class="people-list">
+          <li class="empty-tip">暂无已录入人员</li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+
+  <!-- 底部状态栏与日志 -->
+  <footer class="statusbar">
+    <div id="statusText" class="status-pill idle">系统就绪</div>
+    <ul id="logList" class="log-list"></ul>
+  </footer>
+
+  <script src="/js/vendor/face-api.min.js"></script>
+  <script src="/js/api.js?v=3"></script>
+  <script src="/js/vision.js?v=3"></script>
+  <script src="/js/audio.js?v=3"></script>
+  <script src="/js/app.js?v=3"></script>
+</body>
+</html>

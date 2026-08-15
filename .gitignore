@@ -1,0 +1,30 @@
+# ---- Python ----
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# ---- 运行时数据（隐私：人脸特征、姓名、语音缓存）----
+data/
+
+# ---- 本地模型（setup.bat 自动下载，约 190MB）----
+models/
+
+# ---- 前端第三方库（download_models.py 自动下载）----
+static/js/vendor/
+
+# ---- 系统 / 编辑器 ----
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.log
+
+# ---- CodeBuddy 本地规划文件 ----
+.codebuddy/
+
+# ---- 本地上传指引（仅本地参考，不上传）----
+GITHUB_UPLOAD.md
