@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 chcp 65001 >nul
 setlocal
 REM 强制 Python 以 UTF-8 输出，避免中文乱码（与 chcp 65001 对齐）
