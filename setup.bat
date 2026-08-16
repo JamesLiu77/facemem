@@ -56,11 +56,13 @@ echo.
 REM ============================================================
 REM 3. Rebuild incomplete / create virtual environment
 REM ============================================================
-if exist ".venv" if not exist ".venv\Scripts\python.exe" (
-    echo [Tip] Incomplete venv detected, deleting and rebuilding ...
-    rmdir /s /q ".venv"
-)
-if not exist ".venv" (
+if exist ".venv\Scripts\python.exe" (
+    echo [2/5] Virtual environment already exists, skipping
+) else (
+    if exist ".venv" (
+        echo [Tip] Incomplete venv detected, deleting and rebuilding ...
+        rmdir /s /q ".venv"
+    )
     echo [2/5] Creating virtual environment ...
     %PY_CMD% -m venv .venv >> "%LOG%" 2>&1
     if errorlevel 1 (
@@ -68,12 +70,10 @@ if not exist ".venv" (
         pause
         exit /b 1
     )
-) else (
-    echo [2/5] Virtual environment already exists, skipping
 )
 if not exist ".venv\Scripts\python.exe" (
-    echo [Error] Venv is abnormal (missing .venv\Scripts\python.exe)
-    echo        Please delete the .venv folder manually and rerun setup.bat
+    echo [Error] Venv creation failed (missing .venv\Scripts\python.exe)
+    echo        Please check %LOG% for details
     pause
     exit /b 1
 )
