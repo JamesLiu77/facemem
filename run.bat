@@ -8,18 +8,15 @@ cd /d "%~dp0"
 
 set "VPY=%~dp0.venv\Scripts\python.exe"
 
-REM Windows Defender real-time scan on freshly created venv executables can make
-REM cmd's "if exist" report FALSE briefly while the file actually exists (the
-REM classic sign: dir lists the file but if exist says missing). So retry a few
-REM times and also confirm with "dir" before giving up.
+REM Verify the venv by EXECUTING it, not by checking file existence.
+REM cmd's "if exist" can report false negatives while Windows Defender is
+REM scanning freshly created executables (dir lists the file but if exist
+REM says missing). But if the interpreter actually runs, the venv is usable.
 set "VENV_OK=0"
 set /a VENV_TRY=0
 :venv_detect
-if exist "%VPY%" set "VENV_OK=1"
-if not "%VENV_OK%"=="1" (
-    dir /b "%VPY%" >nul 2>&1
-    if not errorlevel 1 set "VENV_OK=1"
-)
+"%VPY%" -c "import sys; print('venv python', sys.version.split()[0])" >nul 2>&1
+if not errorlevel 1 set "VENV_OK=1"
 if "%VENV_OK%"=="1" goto :venv_found
 set /a VENV_TRY+=1
 if %VENV_TRY% lss 5 (
@@ -28,7 +25,7 @@ if %VENV_TRY% lss 5 (
 )
 :venv_found
 if not "%VENV_OK%"=="1" (
-    echo [Error] Virtual environment not detected (%VPY%)
+    echo [Error] Cannot execute venv python: %VPY%
     echo        Please run setup.bat first to complete installation, then run this script.
     echo.
     echo [Diag] Current folder: %CD%
