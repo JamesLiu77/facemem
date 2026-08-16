@@ -72,6 +72,14 @@ if exist ".venv\Scripts\python.exe" (
         pause
         exit /b 1
     )
+    REM Windows Defender or disk latency may delay .exe creation after venv returns
+    set /a VENV_WAIT=0
+    :wait_venv
+    if exist ".venv\Scripts\python.exe" goto :venv_ready
+    timeout /t 1 /nobreak >nul
+    set /a VENV_WAIT+=1
+    if %VENV_WAIT% lss 10 goto :wait_venv
+    :venv_ready
 )
 if not exist ".venv\Scripts\python.exe" (
     echo [Error] Venv creation failed (missing .venv\Scripts\python.exe)
