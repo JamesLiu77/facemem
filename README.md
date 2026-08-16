@@ -51,7 +51,10 @@
    - 创建虚拟环境 `.venv`
    - 安装全部 Python 依赖（含 edge-tts）
    - 下载本地模型到 `models/`（约 190 MB，一次性；TTS 无需下载模型）
-2. 若模型下载中断，可随时重新运行 `python download_models.py`（断点续传）。
+2. 全程日志会写入项目目录下的 `setup.log`：
+   - 若双击后窗口一闪而过、看不到安装进度，请打开 `setup.log` 查看具体错误
+   - 若没有自动创建 `.venv`，多为 Python 版本低于 3.10，或安装 Python 时未勾选 "Add Python to PATH"
+3. 若模型下载中断，可随时重新运行 `python download_models.py`（断点续传）。
 
 ### macOS / Linux
 
@@ -101,6 +104,7 @@
 
 | 问题 | 解决方式 |
 |---|---|
+| 双击 `setup.bat` 一闪而过 / 没有自动创建 `.venv` | 打开项目目录下的 `setup.log` 查看具体错误；常见原因是 Python 版本低于 3.10，或安装 Python 时未勾选 "Add Python to PATH"。升级 Python 或重新勾选后重跑 |
 | 安装依赖失败 | 检查网络后重跑 `setup.bat`（Windows）或 `./setup.sh`（macOS）；如 dlib 相关报错可忽略（本项目不依赖 dlib） |
 | 模型下载失败 | 重跑 `python download_models.py`，支持断点续传 |
 | 摄像头黑屏/报错 | 确认浏览器地址为 `localhost`（`getUserMedia` 安全要求），并允许摄像头权限；检查摄像头是否被其他程序占用 |

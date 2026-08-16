@@ -3,13 +3,13 @@
 # 用法：先执行 chmod +x run.sh，再运行 ./run.sh
 cd "$(dirname "$0")" || exit 1
 
-if [ ! -d ".venv" ]; then
-    echo "[错误] 未检测到虚拟环境，请先运行 ./setup.sh 完成安装"
+if [ ! -x ".venv/bin/python" ]; then
+    echo "[错误] 未检测到虚拟环境（.venv/bin/python）"
+    echo "        请先运行 ./setup.sh 完成一键安装，再运行本脚本。"
     exit 1
 fi
 
-# shellcheck disable=SC1091
-source ".venv/bin/activate"
+VPY="$(pwd)/.venv/bin/python"
 
 PORT=8000
 echo "正在启动人脸记忆服务 ..."
@@ -45,4 +45,4 @@ ready() {
     done
 ) &
 
-python -m uvicorn server.main:app --host 127.0.0.1 --port "$PORT"
+"$VPY" -m uvicorn server.main:app --host 127.0.0.1 --port "$PORT"
