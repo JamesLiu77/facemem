@@ -29,13 +29,23 @@ echo Browser will automatically open http://localhost:8000
 echo Close this window to stop the service.
 echo.
 
-REM Poll in background until service is ready, then open browser to avoid opening before connection
+REM ============================================================
+REM 6. Start uvicorn (tee output to console and log for diagnosis)
+REM ============================================================
+set "RUN_LOG=run.log"
+if exist "%RUN_LOG%" del "%RUN_LOG%"
+
+REM Background poller: open browser once 127.0.0.1:8000 is ready
 start "" /b powershell -NoProfile -ExecutionPolicy Bypass -Command "$t = New-Object Net.Sockets.TcpClient; $i = 0; while (-not $t.Connected -and $i -lt 40) { try { $t.Connect('127.0.0.1', 8000) } catch {}; if (-not $t.Connected) { Start-Sleep -Milliseconds 500; $i++ } }; if ($t.Connected) { Start-Process 'http://localhost:8000' }" >nul 2>&1
 
-"%VPY%" -m uvicorn server.main:app --host 127.0.0.1 --port 8000
+echo [Launch] %date% %time% > "%RUN_LOG%"
+"%VPY%" -m uvicorn server.main:app --host 127.0.0.1 --port 8000 2>&1 | powershell -NoProfile -Command "Get-Content | Tee-Object -FilePath '%RUN_LOG%' -Append"
 if errorlevel 1 (
     echo.
-    echo [Error] Service failed to start. Check the error message above.
+    echo [Error] Service failed to start.  Last lines from %RUN_LOG%:
+    type "%RUN_LOG%"
+    echo.
+    echo [Hint] If the browser did not open, try manually visiting http://localhost:8000
     pause
 )
 
