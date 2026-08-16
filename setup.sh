@@ -67,14 +67,14 @@ echo
 
 # ---- 安装依赖（venv 内 python/pip，显式路径，不依赖 activate）----
 echo "[3/5] 升级 pip ..." | tee -a "$LOG"
-"$VPY" -m pip install --upgrade pip 2>&1 | tee -a "$LOG"
+"$VPY" -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple 2>&1 | tee -a "$LOG"
 if [ ${PIPESTATUS[0]} -ne 0 ]; then
     echo "[错误] pip 升级失败，请检查网络后重试，详见 $LOG"
     exit 1
 fi
 
 echo "[3/5] 安装 Python 依赖（首次约需几分钟，请耐心等待）..." | tee -a "$LOG"
-"$VPY" -m pip install -r requirements.txt 2>&1 | tee -a "$LOG"
+"$VPY" -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple 2>&1 | tee -a "$LOG"
 if [ ${PIPESTATUS[0]} -ne 0 ]; then
     echo "[错误] 依赖安装失败，请检查网络后重试，详见 $LOG"
     exit 1

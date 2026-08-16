@@ -85,7 +85,7 @@ REM ============================================================
 REM 4. 安装依赖（统一使用 venv 内 python，不依赖 activate/PATH）
 REM ============================================================
 echo [3/5] 升级 pip ...
-"%VPY%" -m pip install --upgrade pip >> "%LOG%" 2>&1
+"%VPY%" -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple >> "%LOG%" 2>&1
 if errorlevel 1 (
     echo [错误] pip 升级失败，请检查网络后重试，详见 %LOG%
     pause
@@ -93,7 +93,7 @@ if errorlevel 1 (
 )
 
 echo [3/5] 安装 Python 依赖（首次约需几分钟，请耐心等待）...
-"%VPY%" -m pip install -r requirements.txt >> "%LOG%" 2>&1
+"%VPY%" -m pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple >> "%LOG%" 2>&1
 if errorlevel 1 (
     echo [错误] 依赖安装失败，请检查网络后重试，详见 %LOG%
     pause
