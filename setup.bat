@@ -56,6 +56,7 @@ echo.
 REM ============================================================
 REM 3. Rebuild incomplete / create virtual environment
 REM ============================================================
+set "NEED_WAIT=0"
 if exist ".venv\Scripts\python.exe" (
     echo [2/5] Virtual environment already exists, skipping
 ) else (
@@ -72,15 +73,22 @@ if exist ".venv\Scripts\python.exe" (
         pause
         exit /b 1
     )
-    REM Windows Defender or disk latency may delay .exe creation after venv returns
-    set /a VENV_WAIT=0
-    :wait_venv
-    if exist ".venv\Scripts\python.exe" goto :venv_ready
-    timeout /t 1 /nobreak >nul
-    set /a VENV_WAIT+=1
-    if %VENV_WAIT% lss 10 goto :wait_venv
-    :venv_ready
+    set "NEED_WAIT=1"
 )
+REM Windows Defender or disk latency may delay .exe creation after venv returns.
+REM NOTE: the wait loop must stay OUTSIDE any parenthesized block - goto/labels
+REM inside a block are unreliable in cmd.exe and can abort the script abruptly.
+if "%NEED_WAIT%"=="1" goto :do_wait
+goto :after_wait
+:do_wait
+set /a VENV_WAIT=0
+:wait_venv
+if exist ".venv\Scripts\python.exe" goto :venv_ready
+timeout /t 1 /nobreak >nul
+set /a VENV_WAIT+=1
+if %VENV_WAIT% lss 10 goto :wait_venv
+:venv_ready
+:after_wait
 if not exist ".venv\Scripts\python.exe" (
     echo [Error] Venv creation failed (missing .venv\Scripts\python.exe)
     echo        Please check %LOG% for details
