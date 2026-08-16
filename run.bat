@@ -6,8 +6,29 @@ set "PYTHONUTF8=1"
 title Face Memory - Launch
 cd /d "%~dp0"
 
-if not exist ".venv\Scripts\python.exe" (
-    echo [Error] Virtual environment not detected (.venv\Scripts\python.exe)
+set "VPY=%~dp0.venv\Scripts\python.exe"
+
+REM Windows Defender real-time scan on freshly created venv executables can make
+REM cmd's "if exist" report FALSE briefly while the file actually exists (the
+REM classic sign: dir lists the file but if exist says missing). So retry a few
+REM times and also confirm with "dir" before giving up.
+set "VENV_OK=0"
+set /a VENV_TRY=0
+:venv_detect
+if exist "%VPY%" set "VENV_OK=1"
+if not "%VENV_OK%"=="1" (
+    dir /b "%VPY%" >nul 2>&1
+    if not errorlevel 1 set "VENV_OK=1"
+)
+if "%VENV_OK%"=="1" goto :venv_found
+set /a VENV_TRY+=1
+if %VENV_TRY% lss 5 (
+    timeout /t 1 /nobreak >nul
+    goto :venv_detect
+)
+:venv_found
+if not "%VENV_OK%"=="1" (
+    echo [Error] Virtual environment not detected (%VPY%)
     echo        Please run setup.bat first to complete installation, then run this script.
     echo.
     echo [Diag] Current folder: %CD%
@@ -21,8 +42,7 @@ if not exist ".venv\Scripts\python.exe" (
     pause
     exit /b 1
 )
-
-set "VPY=%~dp0.venv\Scripts\python.exe"
+echo [Check] Virtual environment detected
 
 echo Starting Face Memory service ...
 echo Browser will automatically open http://localhost:8000
