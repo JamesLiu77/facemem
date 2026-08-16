@@ -66,7 +66,9 @@ if exist ".venv\Scripts\python.exe" (
     echo [2/5] Creating virtual environment ...
     %PY_CMD% -m venv .venv >> "%LOG%" 2>&1
     if errorlevel 1 (
-        echo [Error] Failed to create venv, see %LOG% for details
+        echo [Error] Failed to create venv. Details from %LOG%:
+        type "%LOG%"
+        echo.
         pause
         exit /b 1
     )
