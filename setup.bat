@@ -65,14 +65,11 @@ if exist ".venv\Scripts\python.exe" (
         rmdir /s /q ".venv"
     )
     echo [2/5] Creating virtual environment ...
-    %PY_CMD% -m venv .venv >> "%LOG%" 2>&1
-    if errorlevel 1 (
-        echo [Error] Failed to create venv. Details from %LOG%:
-        type "%LOG%"
-        echo.
-        pause
-        exit /b 1
-    )
+    REM venv output goes to console directly (not log) so any error is visible.
+    REM Do NOT trust the exit code: some Python versions (e.g. 3.13/3.14 on
+    REM Windows) return non-zero even though the venv was created successfully.
+    REM Success is verified by file presence with a wait loop below.
+    %PY_CMD% -m venv .venv
     set "NEED_WAIT=1"
 )
 REM Windows Defender or disk latency may delay .exe creation after venv returns.
@@ -86,12 +83,12 @@ set /a VENV_WAIT=0
 if exist ".venv\Scripts\python.exe" goto :venv_ready
 timeout /t 1 /nobreak >nul
 set /a VENV_WAIT+=1
-if %VENV_WAIT% lss 10 goto :wait_venv
+if %VENV_WAIT% lss 30 goto :wait_venv
 :venv_ready
 :after_wait
 if not exist ".venv\Scripts\python.exe" (
-    echo [Error] Venv creation failed (missing .venv\Scripts\python.exe)
-    echo        Please check %LOG% for details
+    echo [Error] Venv creation failed: .venv\Scripts\python.exe was not created
+    echo        Check the venv error message shown on screen above
     pause
     exit /b 1
 )
