@@ -33,7 +33,7 @@ echo "[1/5] 检测 Python ..."
 echo "[1/5] 使用 Python: $PYTHON_BIN" | tee -a "$LOG"
 "$PYTHON_BIN" -c 'import sys; print("        Python 版本:", sys.version.split()[0])'
 
-if ! "$PYTHON_BIN" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' 2>&1 | tee -a "$LOG" >/dev/null; then
+if ! "$PYTHON_BIN" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' 2>&1 | tee -a "$LOG"; then
     PY_VER=$("$PYTHON_BIN" -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
     echo "[错误] 需要 Python 3.10+，当前为 $PY_VER，请升级"
     exit 1
@@ -48,16 +48,26 @@ if [ -d ".venv" ] && [ ! -x ".venv/bin/python" ]; then
 fi
 if [ ! -d ".venv" ]; then
     echo "[2/5] 创建虚拟环境 ..." | tee -a "$LOG"
-    "$PYTHON_BIN" -m venv .venv >> "$LOG" 2>&1
-    if [ $? -ne 0 ]; then
-        echo "[错误] 创建虚拟环境失败，请查看 $LOG"
-        exit 1
-    fi
+    "$PYTHON_BIN" -m venv .venv 2>&1 | tee -a "$LOG"
 else
     echo "[2/5] 虚拟环境已存在，跳过"
 fi
-if [ ! -x ".venv/bin/python" ]; then
-    echo "[错误] 虚拟环境异常（缺少 .venv/bin/python），请删除 .venv 后重试"
+
+# 结果导向验证：不信任 venv 命令的退出码（部分 Python 版本创建成功但返回非零，
+# 与 Windows 端实测情况一致），改为等待 .venv/bin/python 出现，最多 30 秒，
+# 同时防御 Gatekeeper / Spotlight 索引期间新文件短暂不可见的问题。
+echo "[检测] 等待虚拟环境就绪 ..."
+VENV_READY=0
+for _ in $(seq 1 30); do
+    if [ -x ".venv/bin/python" ]; then
+        VENV_READY=1
+        break
+    fi
+    sleep 1
+done
+if [ "$VENV_READY" != "1" ]; then
+    echo "[错误] 虚拟环境异常（缺少 .venv/bin/python）"
+    echo "        请删除 .venv 目录后重新运行 ./setup.sh"
     exit 1
 fi
 
